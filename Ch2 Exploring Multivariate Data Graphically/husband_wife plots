@@ -1,1 +1,182 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+'''
+Figure 2.1
+'''
+# Load the dataset
+df = pd.read_csv('husbands_wives.csv')
+
+# (a) Scatterplot of husbands' age vs. wives' age
+plt.figure(figsize=(6, 6))
+sns.scatterplot(x='age_husband', y='age_wife', data=df)
+plt.title('(a) Scatterplot: Husbands Age vs. Wives Age')
+plt.xlabel("Husband's Age")
+plt.ylabel("Wife's Age")
+plt.xlim(20, 60)  # Set x-axis limits
+plt.ylim(20, 60)  # Set y-axis limits
+plt.show()
+
+# (b) Scatterplot with y = x line
+plt.figure(figsize=(6, 6))
+sns.scatterplot(x='age_husband', y='age_wife', data=df)
+plt.plot([20, 60], [20, 60], 'r--', label='y = x')  # Add y = x line
+plt.title('(b) Scatterplot with y = x Line')
+plt.xlabel("Husband's Age")
+plt.ylabel("Wife's Age")
+plt.xlim(20, 60)  # Set x-axis limits
+plt.ylim(20, 60)  # Set y-axis limits
+plt.legend()
+plt.show()
+
+# (c) Jittered scatterplot of husbands' age vs. wives' age
+
+plt.figure(figsize=(6, 6))
+x_jittered = df['age_husband'] + np.random.uniform(-0.5, 0.5, size=len(df))
+y_jittered = df['age_wife'] + np.random.uniform(-0.5, 0.5, size=len(df))
+
+sns.scatterplot(x=x_jittered, y=y_jittered, alpha=0.6)
+plt.title('(c) Jittered Scatterplot: Husbands Age vs. Wives Age')
+plt.xlabel("Husband's Age")
+plt.ylabel("Wife's Age")
+plt.xlim(20, 60)
+plt.ylim(20, 60)
+plt.show()
+
+# (d) Scatterplot with marginal distributions
+plt.figure(figsize=(8, 8))
+sns.jointplot(x='age_husband', y='age_wife', data=df, kind='scatter', height=8)
+plt.suptitle('(d) Scatterplot with Marginal Distributions', y=1.02)
+plt.xlabel("Husband's Age")
+plt.ylabel("Wife's Age")
+plt.xlim(20, 60)  # Set x-axis limits
+plt.ylim(20, 60)  # Set y-axis limits
+plt.show()
+
+
+'''
+Figure 2.2
+'''
+
+# Load the dataset
+df = pd.read_csv('husbands_wives.csv')
+
+# Calculate the age difference (husband's age minus wife's age)
+df['age_difference'] = df['age_husband'] - df['age_wife']
+
+# Filter out rows with missing values in 'age_husb_at_marriage' or 'age_difference'
+df_cleaned = df.dropna(subset=['age_husb_at_marriage', 'age_difference'])
+
+# Create the scatterplot
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='age_difference', y='age_husb_at_marriage', data=df_cleaned, alpha=0.7)
+plt.axvline(x=0, color='red', linestyle='--', label='Age Difference = 0')  # Vertical line at x = 0
+plt.title('Scatterplot: Age Difference (Husband - Wife) vs. Husband\'s Age at Marriage')
+plt.xlabel("Age Difference (Husband - Wife)")
+plt.ylabel("Husband's Age at Marriage")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+'''
+Figure 2.3
+'''
+
+# Load the dataset
+df = pd.read_csv('husbands_wives.csv')
+
+# Filter out rows with missing values in height columns
+df_cleaned = df.dropna(subset=['ht_husband', 'ht_wife'])
+
+# Create the first scatterplot: Husbands' height vs. Wives' height
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='ht_husband', y='ht_wife', data=df_cleaned, alpha=0.7)
+plt.title('Scatterplot: Husbands\' Height vs. Wives\' Height')
+plt.xlabel("Husband's Height (mm)")
+plt.ylabel("Wife's Height (mm)")
+plt.grid(True)
+plt.show()
+
+# Create the second scatterplot with y = x line
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='ht_husband', y='ht_wife', data=df_cleaned, alpha=0.7)
+plt.plot([min(df_cleaned['ht_husband']), max(df_cleaned['ht_husband'])], 
+         [min(df_cleaned['ht_husband']), max(df_cleaned['ht_husband'])], 
+         color='red', linestyle='--', label='y = x')  # y = x line
+plt.title('Scatterplot: Husbands\' Height vs. Wives\' Height with y = x Line')
+plt.xlabel("Husband's Height (mm)")
+plt.ylabel("Wife's Height (mm)")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+'''
+Figure 2.4
+'''
+# Load the dataset
+df = pd.read_csv('husbands_wives.csv')
+
+# Calculate age difference (husband's age minus wife's age)
+df['age_difference'] = df['age_husband'] - df['age_wife']
+
+# Calculate height difference (husband's height minus wife's height)
+df['height_difference'] = df['ht_husband'] - df['ht_wife']
+
+# Filter out rows with missing values in age_difference or height_difference
+df_cleaned = df.dropna(subset=['age_difference', 'height_difference'])
+
+# Create the scatterplot
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='age_difference', y='height_difference', data=df_cleaned, alpha=0.7)
+
+# Add vertical and horizontal lines at zero
+plt.axvline(x=0, color='red', linestyle='--', label='Age Difference = 0')  # Vertical line at x = 0
+plt.axhline(y=0, color='blue', linestyle='--', label='Height Difference = 0')  # Horizontal line at y = 0
+
+# Add labels and title
+plt.title('Scatterplot: Age Difference vs. Height Difference for Married Couples')
+plt.xlabel("Age Difference (Husband - Wife)")
+plt.ylabel("Height Difference (Husband - Wife) (mm)")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+
+'''
+Figure 2.5
+'''
+# Load the dataset
+df = pd.read_csv('husbands_wives.csv')
+
+# Select the five variables for the scatterplot matrix
+variables = ['age_husband', 'age_wife', 'ht_husband', 'ht_wife', 'years_married']
+df_selected = df[variables]
+
+# Create the scatterplot matrix using seaborn's pairplot
+sns.pairplot(df_selected, diag_kind='kde', plot_kws={'alpha': 0.7})
+plt.suptitle('Scatterplot Matrix of Five Variables', y=1.02)
+plt.show()
+
+'''
+Figure 2.6
+'''
+
+# Load the dataset
+df = pd.read_csv('husbands_wives.csv')
+
+# Filter out rows with missing values in height columns
+df_cleaned = df.dropna(subset=['ht_husband', 'ht_wife'])
+
+# Create the scatterplot with marginal densities
+sns.jointplot(x='ht_husband', y='ht_wife', data=df_cleaned, kind='scatter', height=8, alpha=0.7, marginal_kws=dict(bins=20, kde=True))
+
+# Add labels and title
+plt.suptitle("Scatterplot of Husband's Height vs. Wife's Height with Marginal Densities", y=1.02)
+plt.xlabel("Husband's Height (mm)")
+plt.ylabel("Wife's Height (mm)")
+
+# Show the plot
+plt.show()
+
 
