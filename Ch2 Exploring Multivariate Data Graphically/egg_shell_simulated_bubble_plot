@@ -1,0 +1,88 @@
+import numpy as np
+import pandas as pd
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Generate synthetic data
+n = 65  # Number of eggs
+pollutant1 = np.random.uniform(0, 400, n)  # Concentration of first pollutant (ppm)
+pollutant2 = pollutant1 + np.random.normal(0, 50, n)  # Concentration of second pollutant (positively correlated)
+thickness = 0.5 - 0.001 * pollutant1 + np.random.normal(0, 0.05, n)  # Eggshell thickness (negative correlation)
+
+# Add an outlier
+pollutant1[-1] = 450  # Outlier for pollutant 1
+pollutant2[-1] = 500  # Outlier for pollutant 2
+thickness[-1] = 0.6   # Outlier for thickness
+
+# Create a DataFrame
+data = pd.DataFrame({
+    'Pollutant1': pollutant1,
+    'Pollutant2': pollutant2,
+    'Thickness': thickness
+})
+
+# Save to CSV (optional)
+data.to_csv('pelican_eggs_dataset.csv', index=False)
+
+
+# Load the dataset
+data = pd.read_csv('pelican_eggs_dataset.csv')
+
+# Check for missing values
+print(data.isnull().sum())
+
+# Normalize thickness for bubble size scaling (optional)
+data['Thickness_normalized'] = (data['Thickness'] - data['Thickness'].min()) / (data['Thickness'].max() - data['Thickness'].min())
+
+
+# Calculate correlation between pollutants and thickness
+correlation_pollutants = data['Pollutant1'].corr(data['Pollutant2'])
+correlation_thickness_pollutant1 = data['Pollutant1'].corr(data['Thickness'])
+correlation_thickness_pollutant2 = data['Pollutant2'].corr(data['Thickness'])
+
+print(f"Correlation between Pollutant1 and Pollutant2: {correlation_pollutants:.2f}")
+print(f"Correlation between Pollutant1 and Thickness: {correlation_thickness_pollutant1:.2f}")
+print(f"Correlation between Pollutant2 and Thickness: {correlation_thickness_pollutant2:.2f}")
+
+# Identify outliers using Z-score
+from scipy.stats import zscore
+data['Z_score_Pollutant1'] = zscore(data['Pollutant1'])
+data['Z_score_Pollutant2'] = zscore(data['Pollutant2'])
+data['Z_score_Thickness'] = zscore(data['Thickness'])
+
+outliers = data[(np.abs(data['Z_score_Pollutant1']) > 3) | 
+                (np.abs(data['Z_score_Pollutant2']) > 3) | 
+                (np.abs(data['Z_score_Thickness']) > 3)]
+print("Outliers:")
+print(outliers)
+
+import matplotlib.pyplot as plt
+
+# Create the bubble plot
+plt.figure(figsize=(10, 6))
+scatter = plt.scatter(
+    data['Pollutant1'], 
+    data['Pollutant2'], 
+    s=data['Thickness_normalized'] * 1000,  # Scale bubble size
+    c=data['Thickness'],  # Color bubbles by thickness
+    alpha=0.6, 
+    cmap='viridis'
+)
+
+# Add labels and title
+plt.xlabel('Concentration of Pollutant 1 (ppm)')
+plt.ylabel('Concentration of Pollutant 2 (ppm)')
+plt.title('Bubble Plot of Pollutant Concentrations vs. Eggshell Thickness')
+
+# Add colorbar
+cbar = plt.colorbar(scatter)
+cbar.set_label('Eggshell Thickness')
+
+# Highlight outliers
+plt.scatter(outliers['Pollutant1'], outliers['Pollutant2'], s=200, edgecolors='red', facecolors='none', label='Outliers')
+plt.legend()
+
+# Show plot
+plt.grid(True)
+plt.show()
